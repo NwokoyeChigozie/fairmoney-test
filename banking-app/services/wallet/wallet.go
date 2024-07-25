@@ -45,7 +45,6 @@ func (w *walletService) DebitWallet(accountID primitive.ObjectID, amount float64
 
 	wallet := &models.Wallet{}
 	walletData, err := w.Storage.SelectOneFromDb(wallet, bson.M{"account_id": accountID})
-	fmt.Println("----2-2-2-2-2---------", walletData, err)
 	if err != nil {
 		return 0, err
 	}
@@ -59,6 +58,11 @@ func (w *walletService) DebitWallet(accountID primitive.ObjectID, amount float64
 		return 0, fmt.Errorf("insufficient funds")
 	}
 
+	_, err = w.ThirdParty.CreateTransaction(accountID.String(), reference, amount)
+	if err != nil {
+		return wallet.Balance, err
+	}
+
 	wallet.Balance = wallet.Balance - amount
 	walletData, err = w.Storage.UpdateRecord(wallet)
 	if err != nil {
@@ -70,12 +74,7 @@ func (w *walletService) DebitWallet(accountID primitive.ObjectID, amount float64
 		return 0, fmt.Errorf("unable to cast to Wallet")
 	}
 
-	transaction, err := transactionService.CreateTransaction(accountID, models.DebitTransaction, amount, reference)
-	if err != nil {
-		return wallet.Balance, err
-	}
-
-	_, err = w.ThirdParty.CreateTransaction(accountID.String(), transaction.Reference, amount)
+	_, err = transactionService.CreateTransaction(accountID, models.DebitTransaction, amount, reference)
 	if err != nil {
 		return wallet.Balance, err
 	}
@@ -109,6 +108,11 @@ func (w *walletService) CreditWallet(accountID primitive.ObjectID, amount float6
 		return 0, fmt.Errorf("unable to cast to Wallet")
 	}
 
+	_, err = w.ThirdParty.CreateTransaction(accountID.String(), reference, amount)
+	if err != nil {
+		return wallet.Balance, err
+	}
+
 	wallet.Balance = wallet.Balance + amount
 	walletData, err = w.Storage.UpdateRecord(wallet)
 	if err != nil {
@@ -120,12 +124,7 @@ func (w *walletService) CreditWallet(accountID primitive.ObjectID, amount float6
 		return 0, fmt.Errorf("unable to cast to Wallet")
 	}
 
-	transaction, err := transactionService.CreateTransaction(accountID, models.CreditTransaction, amount, reference)
-	if err != nil {
-		return wallet.Balance, err
-	}
-
-	_, err = w.ThirdParty.CreateTransaction(accountID.String(), transaction.Reference, amount)
+	_, err = transactionService.CreateTransaction(accountID, models.CreditTransaction, amount, reference)
 	if err != nil {
 		return wallet.Balance, err
 	}
