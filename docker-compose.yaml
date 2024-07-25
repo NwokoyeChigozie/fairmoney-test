@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  banking-app:
+    build:
+      context: ./banking-app
+    env_file:
+      - ./banking-app/.env
+    ports:
+      - "8098:8098"
+    networks:
+      - fairmoney
+
+  third-party:
+    build:
+      context: ./third-party
+    ports:
+      - "8099:8099"
+    env_file:
+      - ./third-party/.env
+    networks:
+      - fairmoney
+
+networks:
+  fairmoney:
+    driver: bridge

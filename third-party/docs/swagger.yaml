@@ -1,0 +1,68 @@
+definitions:
+  http_handler.CreatePayment:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      reference:
+        type: string
+    required:
+    - account_id
+    - amount
+    - reference
+    type: object
+  models.Transaction:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      reference:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /third-party/payments:
+    post:
+      consumes:
+      - application/json
+      description: Create a new Transaction
+      parameters:
+      - description: Payment info
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/http_handler.CreatePayment'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Transaction'
+      summary: Create a Transaction
+      tags:
+      - payments
+  /third-party/payments/{reference}:
+    get:
+      description: Get Transaction by payment reference
+      parameters:
+      - description: Payment Reference
+        in: path
+        name: reference
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Transaction'
+      summary: Get a transaction
+      tags:
+      - payments
+swagger: "2.0"

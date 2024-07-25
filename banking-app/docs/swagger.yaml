@@ -1,0 +1,67 @@
+definitions:
+  http_handler.CrDrRequestBody:
+    properties:
+      account_id:
+        type: string
+      amount:
+        type: number
+      reference:
+        type: string
+    required:
+    - account_id
+    - amount
+    - reference
+    type: object
+  http_handler.CrDrResponseBody:
+    properties:
+      balance:
+        type: number
+    type: object
+info:
+  contact: {}
+paths:
+  /bank-api/credit-wallet:
+    post:
+      consumes:
+      - application/json
+      description: Credit Wallet
+      parameters:
+      - description: Credit wallet request
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/http_handler.CrDrRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http_handler.CrDrResponseBody'
+      summary: Credit Wallet
+      tags:
+      - credit
+  /bank-api/debit-wallet:
+    post:
+      consumes:
+      - application/json
+      description: Debit Wallet
+      parameters:
+      - description: Debit wallet request
+        in: body
+        name: payment
+        required: true
+        schema:
+          $ref: '#/definitions/http_handler.CrDrRequestBody'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/http_handler.CrDrResponseBody'
+      summary: Debit Wallet
+      tags:
+      - debit
+swagger: "2.0"
